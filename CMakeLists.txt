@@ -54,8 +54,13 @@ endif()
 if(NOT PROTOBUF_ROOT_DIR)
   set(PROTOBUF_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/third_party/protobuf)
 endif()
-if(NOT ZLIB_ROOT_DIR)
+if(NOT ZLIB_ROOT_DIR AND NOT ANDROID)
   set(ZLIB_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/third_party/zlib)
+endif()
+if(ANDROID)
+  set(ZLIB_LIBRARY -lz)
+else()
+  set(ZLIB_LIBRARY zlibstatic)
 endif()
 
 # Building the protobuf tests require gmock what is not part of a standard protobuf checkout.
@@ -67,7 +72,9 @@ endif()
 
 add_subdirectory(${BORINGSSL_ROOT_DIR} third_party/boringssl)
 add_subdirectory(${PROTOBUF_ROOT_DIR}/cmake third_party/protobuf)
-add_subdirectory(${ZLIB_ROOT_DIR} third_party/zlib)
+if(NOT ANDROID)
+  add_subdirectory(${ZLIB_ROOT_DIR} third_party/zlib)
+endif()
 
 set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS}   -std=c11")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
@@ -126,9 +133,17 @@ target_include_directories(gpr
   PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include
   PRIVATE ${BORINGSSL_ROOT_DIR}/include
   PRIVATE ${PROTOBUF_ROOT_DIR}/src
-  PRIVATE ${ZLIB_ROOT_DIR}
-  PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/third_party/zlib
 )
+if(NOT ANDROID)
+  target_include_directories(gpr
+    PRIVATE ${ZLIB_ROOT_DIR}
+    PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/third_party/zlib
+  )
+endif()
+
+if(ANDROID)
+  target_link_libraries(gpr log)
+endif()
 
 
   
@@ -326,13 +341,17 @@ target_include_directories(grpc
   PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include
   PRIVATE ${BORINGSSL_ROOT_DIR}/include
   PRIVATE ${PROTOBUF_ROOT_DIR}/src
-  PRIVATE ${ZLIB_ROOT_DIR}
-  PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/third_party/zlib
 )
+if(NOT ANDROID)
+  target_include_directories(gpr
+    PRIVATE ${ZLIB_ROOT_DIR}
+    PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/third_party/zlib
+  )
+endif()
 
 target_link_libraries(grpc
   ssl
-  zlibstatic
+  ${ZLIB_LIBRARY}
   gpr
 )
 
@@ -508,9 +527,13 @@ target_include_directories(grpc_cronet
   PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include
   PRIVATE ${BORINGSSL_ROOT_DIR}/include
   PRIVATE ${PROTOBUF_ROOT_DIR}/src
-  PRIVATE ${ZLIB_ROOT_DIR}
-  PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/third_party/zlib
 )
+if(NOT ANDROID)
+  target_include_directories(gpr
+    PRIVATE ${ZLIB_ROOT_DIR}
+    PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/third_party/zlib
+  )
+endif()
 
 target_link_libraries(grpc_cronet
   ssl
@@ -683,9 +706,13 @@ target_include_directories(grpc_unsecure
   PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include
   PRIVATE ${BORINGSSL_ROOT_DIR}/include
   PRIVATE ${PROTOBUF_ROOT_DIR}/src
-  PRIVATE ${ZLIB_ROOT_DIR}
-  PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/third_party/zlib
 )
+if(NOT ANDROID)
+  target_include_directories(gpr
+    PRIVATE ${ZLIB_ROOT_DIR}
+    PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/third_party/zlib
+  )
+endif()
 
 target_link_libraries(grpc_unsecure
   gpr
@@ -820,9 +847,13 @@ target_include_directories(grpc++
   PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include
   PRIVATE ${BORINGSSL_ROOT_DIR}/include
   PRIVATE ${PROTOBUF_ROOT_DIR}/src
-  PRIVATE ${ZLIB_ROOT_DIR}
-  PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/third_party/zlib
 )
+if(NOT ANDROID)
+  target_include_directories(gpr
+    PRIVATE ${ZLIB_ROOT_DIR}
+    PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/third_party/zlib
+  )
+endif()
 
 target_link_libraries(grpc++
   ssl
@@ -844,9 +875,13 @@ target_include_directories(grpc++_reflection
   PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include
   PRIVATE ${BORINGSSL_ROOT_DIR}/include
   PRIVATE ${PROTOBUF_ROOT_DIR}/src
-  PRIVATE ${ZLIB_ROOT_DIR}
-  PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/third_party/zlib
 )
+if(NOT ANDROID)
+  target_include_directories(gpr
+    PRIVATE ${ZLIB_ROOT_DIR}
+    PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/third_party/zlib
+  )
+endif()
 
 target_link_libraries(grpc++_reflection
   grpc++
@@ -976,9 +1011,13 @@ target_include_directories(grpc++_unsecure
   PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include
   PRIVATE ${BORINGSSL_ROOT_DIR}/include
   PRIVATE ${PROTOBUF_ROOT_DIR}/src
-  PRIVATE ${ZLIB_ROOT_DIR}
-  PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/third_party/zlib
 )
+if(NOT ANDROID)
+  target_include_directories(gpr
+    PRIVATE ${ZLIB_ROOT_DIR}
+    PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/third_party/zlib
+  )
+endif()
 
 target_link_libraries(grpc++_unsecure
   libprotobuf
@@ -1001,9 +1040,13 @@ target_include_directories(grpc_plugin_support
   PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include
   PRIVATE ${BORINGSSL_ROOT_DIR}/include
   PRIVATE ${PROTOBUF_ROOT_DIR}/src
-  PRIVATE ${ZLIB_ROOT_DIR}
-  PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/third_party/zlib
 )
+if(NOT ANDROID)
+  target_include_directories(gpr
+    PRIVATE ${ZLIB_ROOT_DIR}
+    PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/third_party/zlib
+  )
+endif()
 
 target_link_libraries(grpc_plugin_support
   libprotoc
@@ -1019,9 +1062,13 @@ target_include_directories(grpc_csharp_ext
   PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include
   PRIVATE ${BORINGSSL_ROOT_DIR}/include
   PRIVATE ${PROTOBUF_ROOT_DIR}/src
-  PRIVATE ${ZLIB_ROOT_DIR}
-  PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/third_party/zlib
 )
+if(NOT ANDROID)
+  target_include_directories(gpr
+    PRIVATE ${ZLIB_ROOT_DIR}
+    PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/third_party/zlib
+  )
+endif()
 
 target_link_libraries(grpc_csharp_ext
   grpc
@@ -1039,9 +1086,13 @@ target_include_directories(gen_hpack_tables
   PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include
   PRIVATE ${BORINGSSL_ROOT_DIR}/include
   PRIVATE ${PROTOBUF_ROOT_DIR}/src
-  PRIVATE ${ZLIB_ROOT_DIR}
-  PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/third_party/zlib
 )
+if(NOT ANDROID)
+  target_include_directories(gpr
+    PRIVATE ${ZLIB_ROOT_DIR}
+    PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/third_party/zlib
+  )
+endif()
 
 target_link_libraries(gen_hpack_tables
   gpr
@@ -1058,9 +1109,13 @@ target_include_directories(gen_legal_metadata_characters
   PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include
   PRIVATE ${BORINGSSL_ROOT_DIR}/include
   PRIVATE ${PROTOBUF_ROOT_DIR}/src
-  PRIVATE ${ZLIB_ROOT_DIR}
-  PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/third_party/zlib
 )
+if(NOT ANDROID)
+  target_include_directories(gpr
+    PRIVATE ${ZLIB_ROOT_DIR}
+    PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/third_party/zlib
+  )
+endif()
 
 
 
@@ -1073,9 +1128,13 @@ target_include_directories(grpc_create_jwt
   PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include
   PRIVATE ${BORINGSSL_ROOT_DIR}/include
   PRIVATE ${PROTOBUF_ROOT_DIR}/src
-  PRIVATE ${ZLIB_ROOT_DIR}
-  PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/third_party/zlib
 )
+if(NOT ANDROID)
+  target_include_directories(gpr
+    PRIVATE ${ZLIB_ROOT_DIR}
+    PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/third_party/zlib
+  )
+endif()
 
 target_link_libraries(grpc_create_jwt
   ssl
@@ -1093,9 +1152,13 @@ target_include_directories(grpc_print_google_default_creds_token
   PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include
   PRIVATE ${BORINGSSL_ROOT_DIR}/include
   PRIVATE ${PROTOBUF_ROOT_DIR}/src
-  PRIVATE ${ZLIB_ROOT_DIR}
-  PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/third_party/zlib
 )
+if(NOT ANDROID)
+  target_include_directories(gpr
+    PRIVATE ${ZLIB_ROOT_DIR}
+    PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/third_party/zlib
+  )
+endif()
 
 target_link_libraries(grpc_print_google_default_creds_token
   grpc
@@ -1112,9 +1175,13 @@ target_include_directories(grpc_verify_jwt
   PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include
   PRIVATE ${BORINGSSL_ROOT_DIR}/include
   PRIVATE ${PROTOBUF_ROOT_DIR}/src
-  PRIVATE ${ZLIB_ROOT_DIR}
-  PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/third_party/zlib
 )
+if(NOT ANDROID)
+  target_include_directories(gpr
+    PRIVATE ${ZLIB_ROOT_DIR}
+    PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/third_party/zlib
+  )
+endif()
 
 target_link_libraries(grpc_verify_jwt
   grpc
@@ -1131,9 +1198,13 @@ target_include_directories(grpc_cpp_plugin
   PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include
   PRIVATE ${BORINGSSL_ROOT_DIR}/include
   PRIVATE ${PROTOBUF_ROOT_DIR}/src
-  PRIVATE ${ZLIB_ROOT_DIR}
-  PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/third_party/zlib
 )
+if(NOT ANDROID)
+  target_include_directories(gpr
+    PRIVATE ${ZLIB_ROOT_DIR}
+    PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/third_party/zlib
+  )
+endif()
 
 target_link_libraries(grpc_cpp_plugin
   libprotoc
@@ -1150,9 +1221,13 @@ target_include_directories(grpc_csharp_plugin
   PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include
   PRIVATE ${BORINGSSL_ROOT_DIR}/include
   PRIVATE ${PROTOBUF_ROOT_DIR}/src
-  PRIVATE ${ZLIB_ROOT_DIR}
-  PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/third_party/zlib
 )
+if(NOT ANDROID)
+  target_include_directories(gpr
+    PRIVATE ${ZLIB_ROOT_DIR}
+    PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/third_party/zlib
+  )
+endif()
 
 target_link_libraries(grpc_csharp_plugin
   libprotoc
@@ -1169,9 +1244,13 @@ target_include_directories(grpc_node_plugin
   PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include
   PRIVATE ${BORINGSSL_ROOT_DIR}/include
   PRIVATE ${PROTOBUF_ROOT_DIR}/src
-  PRIVATE ${ZLIB_ROOT_DIR}
-  PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/third_party/zlib
 )
+if(NOT ANDROID)
+  target_include_directories(gpr
+    PRIVATE ${ZLIB_ROOT_DIR}
+    PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/third_party/zlib
+  )
+endif()
 
 target_link_libraries(grpc_node_plugin
   libprotoc
@@ -1188,9 +1267,13 @@ target_include_directories(grpc_objective_c_plugin
   PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include
   PRIVATE ${BORINGSSL_ROOT_DIR}/include
   PRIVATE ${PROTOBUF_ROOT_DIR}/src
-  PRIVATE ${ZLIB_ROOT_DIR}
-  PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/third_party/zlib
 )
+if(NOT ANDROID)
+  target_include_directories(gpr
+    PRIVATE ${ZLIB_ROOT_DIR}
+    PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/third_party/zlib
+  )
+endif()
 
 target_link_libraries(grpc_objective_c_plugin
   libprotoc
@@ -1207,9 +1290,13 @@ target_include_directories(grpc_python_plugin
   PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include
   PRIVATE ${BORINGSSL_ROOT_DIR}/include
   PRIVATE ${PROTOBUF_ROOT_DIR}/src
-  PRIVATE ${ZLIB_ROOT_DIR}
-  PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/third_party/zlib
 )
+if(NOT ANDROID)
+  target_include_directories(gpr
+    PRIVATE ${ZLIB_ROOT_DIR}
+    PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/third_party/zlib
+  )
+endif()
 
 target_link_libraries(grpc_python_plugin
   libprotoc
@@ -1226,9 +1313,13 @@ target_include_directories(grpc_ruby_plugin
   PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include
   PRIVATE ${BORINGSSL_ROOT_DIR}/include
   PRIVATE ${PROTOBUF_ROOT_DIR}/src
-  PRIVATE ${ZLIB_ROOT_DIR}
-  PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/third_party/zlib
 )
+if(NOT ANDROID)
+  target_include_directories(gpr
+    PRIVATE ${ZLIB_ROOT_DIR}
+    PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/third_party/zlib
+  )
+endif()
 
 target_link_libraries(grpc_ruby_plugin
   libprotoc
