@@ -3,8 +3,8 @@
 	url = https://github.com/madler/zlib
 [submodule "third_party/protobuf"]
 	path = third_party/protobuf
-	url = https://github.com/google/protobuf.git
-	branch = 3.0.0-GA
+	url = https://github.com/garyp/protobuf.git
+	branch = android-aosp
 [submodule "third_party/gflags"]
 	path = third_party/gflags
 	url = https://github.com/gflags/gflags.git
